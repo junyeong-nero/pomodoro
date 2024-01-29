@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/controllers/UserDataController.dart';
-import 'package:realm/realm.dart';
 
 import '../designs/theme.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});
@@ -18,8 +20,25 @@ class _LoginState extends State<LoginPage> {
   var controller = UserDataController();
   final color = CustomTheme.currentTheme;
 
-  void signIn() {
+  void signIn() async {
+    // localhost:3000/userRouter/
 
+    Map userData = {
+      'id': 'magicwho',
+      'password': 'genuine1!'
+    };
+
+    var url = Uri.http('localhost:3000', 'userRouter/api/login');
+    var response = await http.post(url, headers: <String, String>{
+      // 'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+      // 'Accept': '*/*'
+    }, body: json.encode(userData));
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    // print(await http.read(Uri.https('example.com', 'foobar.txt')));
   }
 
   void signUp() {

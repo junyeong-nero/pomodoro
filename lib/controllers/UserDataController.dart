@@ -1,8 +1,6 @@
 import 'dart:math' show Random;
 import 'package:pomodoro/models/UserData.dart';
 import 'package:intl/intl.dart';
-import 'package:realm/realm.dart';
-import 'dart:ffi';
 
 class UserDataController {
   var userData = UserData.init();
@@ -24,14 +22,7 @@ class UserDataController {
   }
 
   void login_test() async {
-    final appConfig = AppConfiguration("application-0-yrdmx");
-    final app = App(appConfig);
-    email = "test@gmail.com";
-    password = "test1234";
-    final anonCredentials = Credentials.emailPassword(email, password);
-    await app.logIn(anonCredentials);
-    print("login success!");
-    print(app.currentUser);
+
   }
 
   /// 연속으로 집중한 일수를 반환합니다.

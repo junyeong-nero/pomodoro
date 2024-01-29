@@ -332,7 +332,7 @@ packages:
     source: hosted
     version: "2.3.1"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
@@ -539,14 +539,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
-  realm:
-    dependency: "direct main"
-    description:
-      name: realm
-      sha256: e8a25f0dd6448104b692ac432679914d3196b3c67235afa257c559d7d5c21969
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.7.0"
   realm_common:
     dependency: transitive
     description:
@@ -778,4 +770,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.2.2 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=3.7.0"
