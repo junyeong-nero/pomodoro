@@ -3,6 +3,7 @@ import 'dart:math' show Random;
 import 'package:pomodoro/models/UserData.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import '../Constants.dart';
 
 class UserDataController {
   var userData = UserData.init();
@@ -24,26 +25,32 @@ class UserDataController {
 
   static Future<http.Response> login(Map userData) async {
     var url = Uri.http('localhost:3000', 'userRouter/api/login');
-    var response = await http.post(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-    }, body: json.encode(userData));
+    var response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(userData));
     return response;
   }
 
   static Future<http.Response> register(Map userData) async {
     var url = Uri.http('localhost:3000', 'userRouter/api/register');
-    var response = await http.post(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-    }, body: json.encode(userData));
+    var response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(userData));
 
     return response;
   }
 
   static Future<http.Response> update(UserData userData) async {
-    var url = Uri.http('localhost:3000', 'userRouter/api/update');
-    var response = await http.post(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-    }, body: json.encode(userData.toJson()));
+    var url = Uri.http(serverURL, 'userRouter/api/update');
+    var response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(userData.toJson()));
 
     return response;
   }
@@ -52,6 +59,11 @@ class UserDataController {
     if (!isConnected) return false;
     var res = await UserDataController.update(userData);
     return res.body.isEmpty;
+  }
+
+  void logout() {
+    isConnected = false;
+    userData = UserData.init();
   }
 
   /// 연속으로 집중한 일수를 반환합니다.

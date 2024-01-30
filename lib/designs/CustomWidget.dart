@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class CustomWidget {
   var theme = [];
-
   CustomWidget(this.theme);
 
   Column getTitle(String s) {
