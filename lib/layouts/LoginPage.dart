@@ -1,15 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/controllers/UserDataController.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../designs/CustomTheme.dart';
-import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -17,28 +13,33 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginPage> {
-  var controller = UserDataController();
   final color = CustomTheme.currentTheme;
+  var controller = UserDataController();
+  var idController = TextEditingController();
+  var pwController = TextEditingController();
+  var autoLogin = true;
 
   void signIn() async {
-    Map userData = {
-      'id': idController.text,
-      'password': pwController.text
-    };
+    Map userData = {'id': idController.text, 'password': pwController.text};
     var response = await UserDataController.login(userData);
     if (!mounted) return;
     if (response.body.toString() == 'null') {
       popupSnackBar('Login Failed');
     } else {
       Navigator.pop(context, response.body);
+      final storage = await SharedPreferences.getInstance();
+      if (autoLogin) {
+        await storage.setString('id', userData['id']);
+        await storage.setString('password', userData['password']);
+        await storage.setBool('auto_login ', true);
+      } else {
+        await storage.remove('auto_login');
+      }
     }
   }
 
   void signUp() async {
-    Map userData = {
-      'id': idController.text,
-      'password': pwController.text
-    };
+    Map userData = {'id': idController.text, 'password': pwController.text};
     var response = await UserDataController.register(userData);
     if (!mounted) return;
     if (response.body.toString() == 'null') {
@@ -55,11 +56,20 @@ class _LoginState extends State<LoginPage> {
       ..showSnackBar(SnackBar(content: Text(text)));
   }
 
-  var idController = TextEditingController();
-  var pwController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return color[3];
+      }
+      return color[4];
+    }
+
     return Scaffold(
         backgroundColor: color[3],
         body: Stack(
@@ -70,7 +80,7 @@ class _LoginState extends State<LoginPage> {
               padding: const EdgeInsets.all(4),
               child: IconButton(
                 onPressed: () {
-                  Navigator.pop(context, 'failed');
+                  Navigator.pop(context, 'null');
                 },
                 icon: const Icon(Icons.arrow_back),
               ),
@@ -116,6 +126,25 @@ class _LoginState extends State<LoginPage> {
                           border: InputBorder.none,
                           hintText: "PASSWORD",
                           hintStyle: TextStyle(color: color[3])),
+                    ),
+                  ),
+                  const Gap(8),
+                  SizedBox(
+                    width: 216,
+                    child: Row(
+                      children: [
+                        Checkbox(
+                            value: autoLogin,
+                            checkColor: color[1],
+                            fillColor:
+                                MaterialStateProperty.resolveWith(getColor),
+                            onChanged: (bool? v) {
+                              setState(() {
+                                autoLogin = v!;
+                              });
+                            }),
+                        Text("Automatic Login")
+                      ],
                     ),
                   ),
                   const Gap(16),

@@ -8,6 +8,7 @@ import '../Constants.dart';
 class UserDataController {
   var userData = UserData.init();
   var isConnected = false;
+  var autoLogin = false;
 
   UserDataController() {
     /** TEST Dataset **/

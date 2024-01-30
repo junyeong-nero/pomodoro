@@ -4,6 +4,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/designs/CustomCharts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../ClockTimer.dart';
 import '../Utils.dart';
 import '../designs/BackgroundPainter.dart';
@@ -39,6 +40,27 @@ class _MainPageState extends State<MainPage> {
 
   var fragmentIndex = 0;
   var focusTimeController = TextEditingController();
+
+  void checkAutoLogin() async {
+    print('checkAutoLogin');
+    final storage = await SharedPreferences.getInstance();
+    var autoLogin = storage.containsKey('auto_login');
+    if (!autoLogin) {
+      return;
+    }
+
+    var id = storage.getString('id');
+    var password = storage.getString('password');
+    var res = await UserDataController.login({'id': id, 'password': password});
+    if (res.body.toString() == 'null') {
+      return;
+    }
+
+    setState(() {
+      dataController.isConnected = true;
+      dataController.init(json.decode(res.body.toString()));
+    });
+  }
 
   Widget getFragment(var index) {
     /** Clock Fragment **/
@@ -613,11 +635,6 @@ class _MainPageState extends State<MainPage> {
     dataController.updateUserData();
   }
 
-  void init() {
-    _timer.handler = timerHandler;
-    size = MediaQuery.of(context).size;
-  }
-
   bool fragmentButtonClick(var index) {
     dataController.updateUserData();
     setState(() {
@@ -637,11 +654,13 @@ class _MainPageState extends State<MainPage> {
   }
 
   void logButtonClick() {
-    if (!dataController.isConnected) {
-      _navigateLogin(context);
-    } else {
-      dataController.logout();
-    }
+    setState(() {
+      if (!dataController.isConnected) {
+        _navigateLogin(context);
+      } else {
+        dataController.logout();
+      }
+    });
   }
 
   Future<void> _navigateLogin(BuildContext context) async {
@@ -661,8 +680,16 @@ class _MainPageState extends State<MainPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _timer.handler = timerHandler;
+    checkAutoLogin();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    init();
+    size = MediaQuery.of(context).size;
     Color getIconColors(var index) {
       return index == fragmentIndex ? color[0] : color[4];
     }
