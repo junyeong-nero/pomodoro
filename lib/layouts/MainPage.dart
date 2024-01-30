@@ -638,13 +638,13 @@ class _MainPageState extends State<MainPage> {
 
   void logButtonClick() {
     if (!dataController.isConnected) {
-      _navigateAndDisplaySelection(context);
+      _navigateLogin(context);
     } else {
       dataController.logout();
     }
   }
 
-  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+  Future<void> _navigateLogin(BuildContext context) async {
     final result = await Navigator.pushNamed(context, "/login");
     if (!mounted) return;
 
@@ -658,10 +658,6 @@ class _MainPageState extends State<MainPage> {
             dataController.userData.settings.targetTime.toString();
       });
     }
-
-    // ScaffoldMessenger.of(context)
-    //   ..removeCurrentSnackBar()
-    //   ..showSnackBar(SnackBar(content: Text(jsonString)));
   }
 
   @override

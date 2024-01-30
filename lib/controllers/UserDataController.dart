@@ -19,10 +19,13 @@ class UserDataController {
     }
   }
 
+  /// initialize UserData which is connected to DataController with json
   void init(Map<dynamic, dynamic> json) {
     userData = UserData.fromJson(json);
   }
 
+  /// login with userData
+  /// @param(userData) must contain field 'id' and 'password'
   static Future<http.Response> login(Map userData) async {
     var url = Uri.http('localhost:3000', 'userRouter/api/login');
     var response = await http.post(url,
@@ -33,6 +36,10 @@ class UserDataController {
     return response;
   }
 
+  /// register with userData
+  ///
+  /// registered data initialized by UserData.init();
+  /// @param(userData) must contain field 'id' and 'password'
   static Future<http.Response> register(Map userData) async {
     var url = Uri.http('localhost:3000', 'userRouter/api/register');
     var response = await http.post(url,
@@ -44,6 +51,9 @@ class UserDataController {
     return response;
   }
 
+  /// update registered userData
+  ///
+  /// @param(userData) must contain field 'id' and 'password'
   static Future<http.Response> update(UserData userData) async {
     var url = Uri.http(serverURL, 'userRouter/api/update');
     var response = await http.post(url,
@@ -55,18 +65,21 @@ class UserDataController {
     return response;
   }
 
+  /// update registered userData which is connected to UserDataController
+  /// it works equally to UserDataController.update(userDataController.userData);
   Future<bool> updateUserData() async {
     if (!isConnected) return false;
     var res = await UserDataController.update(userData);
     return res.body.isEmpty;
   }
 
+  /// disconnect automatic api calling to update
   void logout() {
     isConnected = false;
     userData = UserData.init();
   }
 
-  /// 연속으로 집중한 일수를 반환합니다.
+  /// return continuous streak days
   int getStreakDays() {
     DateTime d = DateTime.now();
     var days = 0;
@@ -80,6 +93,7 @@ class UserDataController {
     return days;
   }
 
+  /// return total accessed days
   int getAccessDays() {
     if (userData.history.isEmpty) {
       return 0;
@@ -87,7 +101,7 @@ class UserDataController {
     return userData.history.length;
   }
 
-  /// 전체 집중 시간을 반환합니다.
+  /// return total focused time with second
   int getTotalFocused() {
     if (userData.history.isEmpty) {
       return 0;
@@ -95,7 +109,7 @@ class UserDataController {
     return userData.history.values.reduce((value, element) => value + element);
   }
 
-  /// 현재 날짜를 기준으로 부터 days 이후까지 집중시간의 합을 반환합니다.
+  /// return summation of focused time between [now - days, now]
   int getTotalFocusedByDays(int days) {
     DateTime d = DateTime.now();
     var res = 0;
@@ -106,12 +120,12 @@ class UserDataController {
     return res;
   }
 
-  /// 전체 평균 집중시간을 반환합니다.
+  /// return average focused time overall
   double getAverage() {
     return getTotalFocused() / getAccessDays();
   }
 
-  /// 현재 날짜를 기준으로부터 days 이후까지 평균 집중시간을 반환합니다.
+  /// return average focused time between [now - days, now]
   double getAverageByDays(int days) {
     double sum = 0;
     DateTime d = DateTime.now();
@@ -122,30 +136,31 @@ class UserDataController {
     return sum / days;
   }
 
-  int getFocusedTime(DateTime dateTime) {
-    String key = date2str(dateTime);
+  /// return focused time at date
+  int getFocusedTime(DateTime date) {
+    String key = date2str(date);
     if (userData.history.containsKey(key)) {
       return userData.history[key]!;
     }
     return 0;
   }
 
-  /**
-   * 날짜를 yyyy/MM/dd 형식으로 변환합니다.
-   * history에 저장되는 날짜 형식입니다.
-   */
+  /// return dates with format of yyyy/MM/dd
+  /// this conversion is used to save focused time to UserData.history
   String date2str(DateTime d) {
     return DateFormat('yyyy/MM/dd').format(d);
   }
 
-  void updateFocusTime(DateTime d, int time) {
-    String now = date2str(d);
+  /// update focused time at date to time
+  void updateFocusTime(DateTime date, int time) {
+    String now = date2str(date);
     if (!userData.history.containsKey(now)) {
       userData.history[now] = 0;
     }
     userData.history[now] = time;
   }
 
+  /// increment `time` focused time at date
   void addFocusTime(DateTime d, int time) {
     String now = date2str(d);
     if (!userData.history.containsKey(now)) {
@@ -154,10 +169,12 @@ class UserDataController {
     userData.history[now] = userData.history[now]! + time;
   }
 
+  /// increment `time` focused time at now
   void addTodayFocusTime(int time) {
     addFocusTime(DateTime.now(), time);
   }
 
+  /// update target time to UserData.settings.targetTime
   void updateTargetTime(int target) {
     if (target < 0) {
       target = 0;
@@ -168,6 +185,7 @@ class UserDataController {
     userData.settings.targetTime = target;
   }
 
+  /// increment target time to UserData.settings.targetTime
   void addTargetTime(int time) {
     updateTargetTime(userData.settings.targetTime + time);
   }

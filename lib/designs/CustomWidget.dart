@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomWidget {
-  var theme = [];
-  CustomWidget(this.theme);
+  var color = [];
+  CustomWidget(this.color);
 
   Column getTitle(String s) {
     return Column(
@@ -13,7 +13,7 @@ class CustomWidget {
         ),
         SizedBox(
           width: 56,
-          child: Divider(color: theme[0]),
+          child: Divider(color: color[0]),
         )
       ],
     );
@@ -22,12 +22,12 @@ class CustomWidget {
   Card cardView(Icon icon, String content, String sub) {
     return Card(
         elevation: 8,
-        color: theme[4],
+        color: color[4],
         child: Stack(
           children: [
             Container(
               width: 24,
-              margin: EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
               height: 24,
               child: icon,
             ),
