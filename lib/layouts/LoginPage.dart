@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/controllers/UserDataController.dart';
 
-import '../designs/theme.dart';
+import '../designs/CustomTheme.dart';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
@@ -21,35 +21,57 @@ class _LoginState extends State<LoginPage> {
   final color = CustomTheme.currentTheme;
 
   void signIn() async {
-    // localhost:3000/userRouter/
-
     Map userData = {
-      'id': 'magicwho',
-      'password': 'genuine1!'
+      'id': idController.text,
+      'password': pwController.text
     };
 
     var url = Uri.http('localhost:3000', 'userRouter/api/login');
     var response = await http.post(url, headers: <String, String>{
-      // 'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
-      // 'Accept': '*/*'
     }, body: json.encode(userData));
 
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-    // print(await http.read(Uri.https('example.com', 'foobar.txt')));
+    // cannot login
+    if (!mounted) return;
+    if (response.body.toString() == 'null') {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Login Failed'),
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: (){},
+            ),
+          )
+      );
+    } else {
+      Navigator.pop(context, response.body);
+    }
   }
 
-  void signUp() {
-    // Navigator.pop(context, 'yes');
+  void signUp() async {
+    Map userData = {
+      'id': idController.text,
+      'password': pwController.text
+    };
+
+    var url = Uri.http('localhost:3000', 'userRouter/api/register');
+    var response = await http.post(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+    }, body: json.encode(userData));
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
   }
+
+  var idController = TextEditingController();
+  var pwController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    var idController = TextEditingController();
-    var pwController = TextEditingController();
-
     return Scaffold(
         backgroundColor: color[3],
         body: Stack(

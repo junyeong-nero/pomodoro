@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 
 class UserDataController {
   var userData = UserData.init();
-  var email = "";
-  var password = "";
   var login = false;
 
   UserDataController() {
@@ -17,12 +15,15 @@ class UserDataController {
       }
     }
 
+    print(userData.history);
+
     var json = userData.toJson();
     userData = UserData.fromJson(json);
   }
 
-  void login_test() async {
-
+  void init(Map<dynamic, dynamic> json) {
+    userData = UserData.fromJson(json);
+    print(userData.toJson());
   }
 
   /// 연속으로 집중한 일수를 반환합니다.
@@ -40,11 +41,17 @@ class UserDataController {
   }
 
   int getAccessDays() {
+    if (userData.history.isEmpty) {
+      return 0;
+    }
     return userData.history.length;
   }
 
   /// 전체 집중 시간을 반환합니다.
   int getTotalFocused() {
+    if (userData.history.isEmpty) {
+      return 0;
+    }
     return userData.history.values.reduce((value, element) => value + element);
   }
 

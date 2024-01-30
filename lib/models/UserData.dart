@@ -2,41 +2,43 @@
 //
 // part 'car.g.dart';
 
+import 'dart:convert';
+
 class UserData {
-
-  String name;
   String? id;
-  Settings settings;
-  Map<String, int> history;
+  String? password;
+  String? name;
+  Settings settings = Settings();
+  Map<String, dynamic> history = {};
 
-  UserData({
-    required this.name,
-    required this.settings,
-    this.id,
-    required this.history});
-
+  UserData({this.id, this.password, this.name});
 
   Map<dynamic, dynamic> toJson() {
     return {
       "name": name,
+      "id": id,
+      "password": password,
       "settings": settings.toJson(),
       "history": history
     };
   }
 
   factory UserData.init() {
-    return UserData(name: "user", settings: Settings(), history: <String, int>{});
+    return UserData(
+        id: "test_id", password: "test_password", name: "test_name");
   }
 
   factory UserData.fromJson(Map<dynamic, dynamic> json) {
-    return UserData(
-        id: json['_id'],
-        name: json['name'],
-        settings: Settings.fromJson(json['settings']),
-        history: json['history']
-    );
+    var user = UserData(
+        id: json['id'], password: json['password'], name: json['name']);
+    user.settings = Settings.fromJson(json['settings']);
+    user.history = {};
+    json['history'].forEach((key, value) {
+      print('key: $key, value: $value');
+      user.history[key.toString()] = value;
+    });
+    return user;
   }
-
 }
 
 class Settings {
