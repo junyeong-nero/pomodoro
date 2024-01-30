@@ -1,10 +1,12 @@
+import 'dart:convert';
 import 'dart:math' show Random;
 import 'package:pomodoro/models/UserData.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class UserDataController {
   var userData = UserData.init();
-  var login = false;
+  var isConnected = false;
 
   UserDataController() {
     /** TEST Dataset **/
@@ -14,16 +16,42 @@ class UserDataController {
             Random().nextInt(60 * 3) * 60);
       }
     }
-
-    print(userData.history);
-
-    var json = userData.toJson();
-    userData = UserData.fromJson(json);
   }
 
   void init(Map<dynamic, dynamic> json) {
     userData = UserData.fromJson(json);
-    print(userData.toJson());
+  }
+
+  static Future<http.Response> login(Map userData) async {
+    var url = Uri.http('localhost:3000', 'userRouter/api/login');
+    var response = await http.post(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+    }, body: json.encode(userData));
+    return response;
+  }
+
+  static Future<http.Response> register(Map userData) async {
+    var url = Uri.http('localhost:3000', 'userRouter/api/register');
+    var response = await http.post(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+    }, body: json.encode(userData));
+
+    return response;
+  }
+
+  static Future<http.Response> update(UserData userData) async {
+    var url = Uri.http('localhost:3000', 'userRouter/api/update');
+    var response = await http.post(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+    }, body: json.encode(userData.toJson()));
+
+    return response;
+  }
+
+  Future<bool> updateUserData() async {
+    if (!isConnected) return false;
+    var res = await UserDataController.update(userData);
+    return res.body.isEmpty;
   }
 
   /// 연속으로 집중한 일수를 반환합니다.

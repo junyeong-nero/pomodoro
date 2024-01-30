@@ -32,11 +32,7 @@ class UserData {
     var user = UserData(
         id: json['id'], password: json['password'], name: json['name']);
     user.settings = Settings.fromJson(json['settings']);
-    user.history = {};
-    json['history'].forEach((key, value) {
-      print('key: $key, value: $value');
-      user.history[key.toString()] = value;
-    });
+    user.history = json['history'];
     return user;
   }
 }

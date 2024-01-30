@@ -3,6 +3,7 @@ import 'dart:math' show max;
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:pomodoro/models/UserData.dart';
 import '../ClockTimer.dart';
 import '../designs/BackgroundPainter.dart';
 import '../designs/CustomWidget.dart';
@@ -40,7 +41,6 @@ class _MainPageState extends State<MainPage> {
 
   String convertSecond2Hour(int second) {
     return "${(second / 3600).toStringAsFixed(1)}H";
-    // return "${"${(second / 3600).floor()}".padLeft(2, "0")}:${"${(second % 3600 / 60).floor()}".padLeft(2, "0")}";
   }
 
   var fragmentIndex = 0;
@@ -272,7 +272,7 @@ class _MainPageState extends State<MainPage> {
                           height: 32,
                           child: Container(
                               decoration: BoxDecoration(
-                                  color: dataController.login
+                                  color: dataController.isConnected
                                       ? color[3]
                                       : color[2],
                                   borderRadius: const BorderRadius.all(
@@ -280,7 +280,7 @@ class _MainPageState extends State<MainPage> {
                               child: TextButton(
                                 onPressed: logButtonClick,
                                 child: Text(
-                                  dataController.login ? "OUT" : "IN",
+                                  dataController.isConnected ? "OUT" : "IN",
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -876,6 +876,7 @@ class _MainPageState extends State<MainPage> {
   void stop() {
     _timer.progress = 0;
     _timer.state = ClockState.stop;
+    dataController.updateUserData();
   }
 
   void init() {
@@ -884,6 +885,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   bool fragmentButtonClick(var index) {
+    dataController.updateUserData();
     setState(() {
       fragmentIndex = index;
       if (index == 2) {
@@ -901,10 +903,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   void logButtonClick() {
-    // TODO LOGIN 기능 구현
-    dataController.login = true;
+    dataController.isConnected = true;
     _navigateAndDisplaySelection(context);
-    setState(() {});
   }
 
   Future<void> _navigateAndDisplaySelection(BuildContext context) async {
@@ -915,11 +915,13 @@ class _MainPageState extends State<MainPage> {
     Map<String, dynamic> decode = json.decode(jsonString);
     if (jsonString != 'null') {
       dataController.init(decode);
+      dataController.isConnected = true;
+      setState(() {});
     }
 
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(jsonString)));
+    // ScaffoldMessenger.of(context)
+    //   ..removeCurrentSnackBar()
+    //   ..showSnackBar(SnackBar(content: Text(jsonString)));
   }
 
   @override

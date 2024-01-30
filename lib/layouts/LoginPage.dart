@@ -25,28 +25,10 @@ class _LoginState extends State<LoginPage> {
       'id': idController.text,
       'password': pwController.text
     };
-
-    var url = Uri.http('localhost:3000', 'userRouter/api/login');
-    var response = await http.post(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-    }, body: json.encode(userData));
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
-    // cannot login
+    var response = await UserDataController.login(userData);
     if (!mounted) return;
     if (response.body.toString() == 'null') {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Login Failed'),
-            duration: const Duration(seconds: 5),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: (){},
-            ),
-          )
-      );
+      popupSnackBar('Login Failed');
     } else {
       Navigator.pop(context, response.body);
     }
@@ -57,14 +39,20 @@ class _LoginState extends State<LoginPage> {
       'id': idController.text,
       'password': pwController.text
     };
+    var response = await UserDataController.register(userData);
+    if (!mounted) return;
+    if (response.body.toString() == 'null') {
+      popupSnackBar('Register Failed');
+    } else {
+      popupSnackBar('Register Successed! retry login');
+    }
+  }
 
-    var url = Uri.http('localhost:3000', 'userRouter/api/register');
-    var response = await http.post(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-    }, body: json.encode(userData));
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+  void popupSnackBar(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   var idController = TextEditingController();
