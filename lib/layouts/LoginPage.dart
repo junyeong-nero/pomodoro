@@ -6,6 +6,7 @@ import '../designs/CustomTheme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});
+
   final String title;
 
   @override
@@ -31,7 +32,9 @@ class _LoginState extends State<LoginPage> {
       if (autoLogin) {
         await storage.setString('id', userData['id']);
         await storage.setString('password', userData['password']);
-        await storage.setBool('auto_login ', true);
+        await storage.setBool('auto_login', true);
+        print(storage.get('id'));
+        print(storage.get('password'));
       } else {
         await storage.remove('auto_login');
       }

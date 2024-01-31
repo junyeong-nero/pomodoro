@@ -42,15 +42,18 @@ class _MainPageState extends State<MainPage> {
   var focusTimeController = TextEditingController();
 
   void checkAutoLogin() async {
-    print('checkAutoLogin');
     final storage = await SharedPreferences.getInstance();
-    var autoLogin = storage.containsKey('auto_login');
+    var autoLogin = (storage.getBool('auto_login') ?? false);
     if (!autoLogin) {
       return;
     }
 
-    var id = storage.getString('id');
-    var password = storage.getString('password');
+    var id = storage.getString('id') ?? '';
+    var password = storage.getString('password') ?? '';
+    if (id.isEmpty || password.isEmpty) {
+      return;
+    }
+
     var res = await UserDataController.login({'id': id, 'password': password});
     if (res.body.toString() == 'null') {
       return;
@@ -295,6 +298,7 @@ class _MainPageState extends State<MainPage> {
                                       Radius.circular(100))),
                               child: TextButton(
                                 onPressed: logButtonClick,
+                                onLongPress: logout,
                                 child: Text(
                                   dataController.isConnected ? "OUT" : "IN",
                                   style: TextStyle(
@@ -658,9 +662,25 @@ class _MainPageState extends State<MainPage> {
       if (!dataController.isConnected) {
         _navigateLogin(context);
       } else {
-        dataController.logout();
+        logout();
       }
     });
+  }
+
+  void logout() async {
+    final storage = await SharedPreferences.getInstance();
+    storage.remove('auto_login');
+    storage.remove('id');
+    storage.remove('password');
+
+    setState(() {
+      dataController.isConnected = false;
+      dataController.logout();
+      focusTimeController.text =
+          dataController.userData.settings.targetTime.toString();
+    });
+
+    popupSnackBar('Logout');
   }
 
   Future<void> _navigateLogin(BuildContext context) async {
@@ -668,15 +688,23 @@ class _MainPageState extends State<MainPage> {
     if (!mounted) return;
 
     var jsonString = result.toString();
-    Map<String, dynamic> decode = json.decode(jsonString);
     if (jsonString != 'null') {
+      Map<String, dynamic> decode = json.decode(jsonString);
       setState(() {
         dataController.init(decode);
         dataController.isConnected = true;
         focusTimeController.text =
             dataController.userData.settings.targetTime.toString();
       });
+      popupSnackBar('Successfully Login!');
     }
+  }
+
+  void popupSnackBar(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
