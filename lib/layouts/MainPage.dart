@@ -298,7 +298,7 @@ class _MainPageState extends State<MainPage> {
                                 color: color[1]),
                           ),
                           Text(
-                            dataController.userData.id ?? 'ID',
+                            'ID: ${dataController.userData.id ?? 'ID'}',
                             style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.normal,
