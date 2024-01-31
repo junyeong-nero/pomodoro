@@ -33,8 +33,6 @@ class _LoginState extends State<LoginPage> {
         await storage.setString('id', userData['id']);
         await storage.setString('password', userData['password']);
         await storage.setBool('auto_login', true);
-        print(storage.get('id'));
-        print(storage.get('password'));
       } else {
         await storage.remove('auto_login');
       }
@@ -47,9 +45,13 @@ class _LoginState extends State<LoginPage> {
     if (!mounted) return;
     if (response.body.toString() == 'null') {
       popupSnackBar('Register Failed');
-    } else {
-      popupSnackBar('Register Successed! retry login');
+      return;
     }
+
+    idController.text = '';
+    pwController.text = '';
+    popupSnackBar('Register Success! retry login');
+
   }
 
   void popupSnackBar(String text) {
@@ -104,7 +106,7 @@ class _LoginState extends State<LoginPage> {
                             const BorderRadius.all(Radius.circular(8))),
                     child: TextField(
                       controller: idController,
-                      cursorColor: color[2],
+                      cursorColor: color[4],
                       style: TextStyle(color: color[4]),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -123,11 +125,11 @@ class _LoginState extends State<LoginPage> {
                             const BorderRadius.all(Radius.circular(8))),
                     child: TextField(
                       controller: pwController,
-                      cursorColor: color[2],
+                      cursorColor: color[4],
                       style: TextStyle(color: color[4]),
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "PASSWORD",
+                          hintText: "Password",
                           hintStyle: TextStyle(color: color[3])),
                     ),
                   ),

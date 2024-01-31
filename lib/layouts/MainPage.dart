@@ -251,7 +251,8 @@ class _MainPageState extends State<MainPage> {
         ),
       );
     }
-    if (fragmentIndex == 2) {
+    if (index == 2) {
+      // popupSnackBar('If you do not log in, your data will not be saved.');
       return SizedBox(
         height: size.height - 112,
         child: SingleChildScrollView(
@@ -640,6 +641,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   bool fragmentButtonClick(var index) {
+    if (!dataController.isConnected) {
+      popupSnackBar('If you do not log in, your data will not be saved.');
+    }
     dataController.updateUserData();
     setState(() {
       fragmentIndex = index;
