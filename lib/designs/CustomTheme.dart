@@ -6,6 +6,10 @@ class CustomTheme {
     ColorTheme.origin,
     ColorTheme.greens,
   ];
+  static List<String> themeName = [
+    'origin',
+    'greens',
+  ];
 }
 
 class ColorTheme {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' show max;
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/designs/CustomCharts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -605,7 +606,7 @@ class _MainPageState extends State<MainPage> {
                         Positioned(
                             left: 56,
                             child: Text(
-                              "Vibration",
+                              "Sound",
                               style: TextStyle(fontSize: 18, color: color[0]),
                             )),
                         Positioned(
@@ -638,6 +639,60 @@ class _MainPageState extends State<MainPage> {
                       ],
                     ),
                   )),
+              const Gap(16),
+              customWidget.getTitle("Theme"),
+              const Gap(8),
+
+              /** Sound **/
+              SizedBox(
+                  width: 288,
+                  height: 64,
+                  child: Card(
+                    elevation: 8,
+                    color: color[4],
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Positioned(
+                          left: 16,
+                          width: 24,
+                          height: 24,
+                          child: Icon(Icons.palette, color: color[0]),
+                        ),
+                        Positioned(
+                            left: 56,
+                            child: Text(
+                              CustomTheme.themeName[
+                                  dataController.userData.settings.themeIndex],
+                              style: TextStyle(fontSize: 18, color: color[0]),
+                            )),
+                        Positioned(
+                          right: 16,
+                          width: 64,
+                          height: 32,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  color: dataController.userData.settings.sound
+                                      ? color[3]
+                                      : color[2],
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100))),
+                              child: TextButton(
+                                onPressed: () {
+                                  _navigateThemePicker(context);
+                                },
+                                child: Text(
+                                  'select',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: color[4]),
+                                ),
+                              )),
+                        )
+                      ],
+                    ),
+                  )),
+              const Gap(16),
             ],
           ),
         ),
@@ -766,6 +821,12 @@ class _MainPageState extends State<MainPage> {
       });
       popupSnackBar('Successfully Login!');
     }
+  }
+
+  Future<void> _navigateThemePicker(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, "/theme_picker");
+    if (!mounted) return;
+    print(result);
   }
 
   void popupSnackBar(String text) {

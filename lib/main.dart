@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro/layouts/EmptyPage.dart';
+import 'package:pomodoro/layouts/ThemePickerPage.dart';
 import 'layouts/LoginPage.dart';
 import 'layouts/MainPage.dart';
 
@@ -21,7 +22,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MainPage(title: "Main Page"),
         '/empty': (context) => const EmptyPage(title: "Empty Page"),
-        '/login': (context) => const LoginPage(title: "Login Page")
+        '/login': (context) => const LoginPage(title: "Login Page"),
+        '/theme_picker': (context) =>
+            const ThemePickerPage(title: "ThemePicker Page")
       },
     );
   }
