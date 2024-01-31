@@ -23,12 +23,12 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final ClockTimer _timer = ClockTimer(0);
-  final color = CustomTheme.currentTheme;
-  final customWidget = CustomWidget(ColorTheme.basic);
-  final customCharts = CustomCharts(ColorTheme.basic);
+  final customWidget = CustomWidget(ColorTheme.origin);
+  final customCharts = CustomCharts(ColorTheme.origin);
   final dataController = UserDataController();
 
   late Size size;
+  var color = CustomTheme.currentTheme;
 
   Future<void> timerHandler(int it) async => setState(() {
         if (it > 0) {
@@ -62,7 +62,14 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       dataController.isConnected = true;
       dataController.init(json.decode(res.body.toString()));
+      themeUpdate();
     });
+  }
+
+  void themeUpdate() {
+    color = CustomTheme.themeList[dataController.userData.settings.themeIndex];
+    customCharts.color = color;
+    customWidget.color = color;
   }
 
   Widget getFragment(var index) {
@@ -251,8 +258,59 @@ class _MainPageState extends State<MainPage> {
         ),
       );
     }
+    /** Setting Fragment **/
     if (index == 2) {
-      // popupSnackBar('If you do not log in, your data will not be saved.');
+      Widget getProfileCard() {
+        if (!dataController.isConnected) {
+          return const Gap(4);
+        }
+
+        return SizedBox(
+            width: 288,
+            height: 72,
+            child: Card(
+                elevation: 8,
+                color: color[4],
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: color[4]),
+                        margin: EdgeInsets.all(12),
+                        child: const IconButton(
+                            onPressed: null, icon: Icon(Icons.person))),
+                    Container(
+                      width: 288 - 86,
+                      height: 48,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            dataController.userData.name ?? 'Name',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: color[1]),
+                          ),
+                          Text(
+                            dataController.userData.id ?? 'ID',
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                                color: color[2]),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                )));
+      }
+
       return SizedBox(
         height: size.height - 112,
         child: SingleChildScrollView(
@@ -262,6 +320,10 @@ class _MainPageState extends State<MainPage> {
             children: [
               const Gap(72),
               customWidget.getTitle("Account"),
+              const Gap(8),
+
+              /** Profile Card **/
+              getProfileCard(),
               const Gap(8),
 
               /** Login Card **/
@@ -682,6 +744,7 @@ class _MainPageState extends State<MainPage> {
       dataController.logout();
       focusTimeController.text =
           dataController.userData.settings.targetTime.toString();
+      themeUpdate();
     });
 
     popupSnackBar('Logout');
@@ -699,6 +762,7 @@ class _MainPageState extends State<MainPage> {
         dataController.isConnected = true;
         focusTimeController.text =
             dataController.userData.settings.targetTime.toString();
+        themeUpdate();
       });
       popupSnackBar('Successfully Login!');
     }
