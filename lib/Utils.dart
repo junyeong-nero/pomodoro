@@ -4,6 +4,9 @@ class Utils {
   }
 
   static String convertSecond2Hour(int second) {
-    return "${(second / 3600).toStringAsFixed(1)}H";
+    if (second >= 3600) {
+      return "${(second / 3600).toStringAsFixed(1)}H";
+    }
+    return "${(second / 60).toStringAsFixed(1)}M";
   }
 }

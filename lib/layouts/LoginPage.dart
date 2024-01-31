@@ -14,7 +14,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginPage> {
-  final color = CustomTheme.currentTheme;
   var controller = UserDataController();
   var idController = TextEditingController();
   var pwController = TextEditingController();
@@ -70,13 +69,13 @@ class _LoginState extends State<LoginPage> {
         MaterialState.focused,
       };
       if (states.any(interactiveStates.contains)) {
-        return color[3];
+        return CustomTheme.currentTheme()[3];
       }
-      return color[4];
+      return CustomTheme.currentTheme()[4];
     }
 
     return Scaffold(
-        backgroundColor: color[3],
+        backgroundColor: CustomTheme.currentTheme()[3],
         body: Stack(
           children: [
             Container(
@@ -101,17 +100,17 @@ class _LoginState extends State<LoginPage> {
                     height: 56,
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                        color: color[2],
+                        color: CustomTheme.currentTheme()[2],
                         borderRadius:
                             const BorderRadius.all(Radius.circular(8))),
                     child: TextField(
                       controller: idController,
-                      cursorColor: color[4],
-                      style: TextStyle(color: color[4]),
+                      cursorColor: CustomTheme.currentTheme()[4],
+                      style: TextStyle(color: CustomTheme.currentTheme()[4]),
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "ID",
-                          hintStyle: TextStyle(color: color[3])),
+                          hintStyle: TextStyle(color: CustomTheme.currentTheme()[3])),
                     ),
                   ),
                   const Gap(8),
@@ -120,17 +119,17 @@ class _LoginState extends State<LoginPage> {
                     height: 56,
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                        color: color[2],
+                        color: CustomTheme.currentTheme()[2],
                         borderRadius:
                             const BorderRadius.all(Radius.circular(8))),
                     child: TextField(
                       controller: pwController,
-                      cursorColor: color[4],
-                      style: TextStyle(color: color[4]),
+                      cursorColor: CustomTheme.currentTheme()[4],
+                      style: TextStyle(color: CustomTheme.currentTheme()[4]),
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Password",
-                          hintStyle: TextStyle(color: color[3])),
+                          hintStyle: TextStyle(color: CustomTheme.currentTheme()[3])),
                     ),
                   ),
                   const Gap(8),
@@ -140,7 +139,7 @@ class _LoginState extends State<LoginPage> {
                       children: [
                         Checkbox(
                             value: autoLogin,
-                            checkColor: color[1],
+                            checkColor: CustomTheme.currentTheme()[1],
                             fillColor:
                                 MaterialStateProperty.resolveWith(getColor),
                             onChanged: (bool? v) {
@@ -157,7 +156,7 @@ class _LoginState extends State<LoginPage> {
                       width: 96,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: color[1],
+                        color: CustomTheme.currentTheme()[1],
                         borderRadius:
                             const BorderRadius.all(Radius.circular(8)),
                       ),
@@ -165,14 +164,14 @@ class _LoginState extends State<LoginPage> {
                         onPressed: signIn,
                         child: Text(
                           "sign in",
-                          style: TextStyle(color: color[4]),
+                          style: TextStyle(color: CustomTheme.currentTheme()[4]),
                         ),
                       )),
                   const Gap(4),
                   TextButton(
                     child: Text(
                       "sign up",
-                      style: TextStyle(color: color[1]),
+                      style: TextStyle(color: CustomTheme.currentTheme()[1]),
                     ),
                     onPressed: () {
                       signUp();

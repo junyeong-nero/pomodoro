@@ -4,13 +4,12 @@ import 'package:gap/gap.dart';
 import 'package:pomodoro/controllers/UserDataController.dart';
 
 import '../Utils.dart';
+import 'CustomTheme.dart';
 
 class CustomCharts {
-
   var current = DateTime.now();
-  var color = [];
 
-  CustomCharts(this.color);
+  CustomCharts();
 
   Stack getTodayChart(UserDataController dataController) {
     var values = [
@@ -26,8 +25,10 @@ class CustomCharts {
       ratios.add(values[i] / maxValue);
     }
 
-    var textStyle =
-        TextStyle(fontWeight: FontWeight.bold, color: color[0], fontSize: 16);
+    var textStyle = TextStyle(
+        fontWeight: FontWeight.bold,
+        color: CustomTheme.currentTheme()[0],
+        fontSize: 16);
 
     // var height = size.height * 0.3;
     var height = 260;
@@ -47,7 +48,7 @@ class CustomCharts {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: color[5],
+                        color: CustomTheme.currentTheme()[5],
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(4.0),
                             topRight: Radius.circular(4.0)),
@@ -72,7 +73,7 @@ class CustomCharts {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: color[1],
+                        color: CustomTheme.currentTheme()[1],
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(4.0),
                             topRight: Radius.circular(4.0)),
@@ -98,7 +99,7 @@ class CustomCharts {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: color[2],
+                        color: CustomTheme.currentTheme()[2],
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(4.0),
                             topRight: Radius.circular(4.0)),
@@ -115,6 +116,7 @@ class CustomCharts {
       ],
     );
   }
+
   Stack getWeeklyChart(UserDataController dataController) {
     List<int> values = [];
     for (var i = 6; i >= 0; i--) {
@@ -124,8 +126,10 @@ class CustomCharts {
 
     var maxValue = max(1, values.reduce(max));
     var avg = dataController.getAverageByDays(7);
-    var textStyle =
-        TextStyle(fontWeight: FontWeight.bold, color: color[0], fontSize: 16);
+    var textStyle = TextStyle(
+        fontWeight: FontWeight.bold,
+        color: CustomTheme.currentTheme()[0],
+        fontSize: 16);
 
     List<double> ratios = [];
     for (var i = 0; i < values.length; i++) {
@@ -158,8 +162,10 @@ class CustomCharts {
                   child: Container(
                     decoration: BoxDecoration(
                       color: i == 6
-                          ? color[5]
-                          : (values[i] > avg ? color[1] : color[2]),
+                          ? CustomTheme.currentTheme()[5]
+                          : (values[i] > avg
+                              ? CustomTheme.currentTheme()[1]
+                              : CustomTheme.currentTheme()[2]),
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4.0),
                           topRight: Radius.circular(4.0)),
@@ -179,6 +185,7 @@ class CustomCharts {
 
     return Stack(alignment: Alignment.bottomCenter, children: stackChild);
   }
+
   Stack getMonthlyChart(UserDataController dataController, Function callBack) {
     void prevMonth() {
       current = DateTime(current.year, current.month - 1);
@@ -199,7 +206,7 @@ class CustomCharts {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-              color: color[3],
+              color: CustomTheme.currentTheme()[3],
               borderRadius: const BorderRadius.all(Radius.circular(4.0))),
         ));
       }
@@ -210,13 +217,15 @@ class CustomCharts {
         var now = DateTime.now();
         var value = dataController.getFocusedTime(d);
         if (d == DateTime(now.year, now.month, now.day)) {
-          return color[5];
+          return CustomTheme.currentTheme()[5];
         } else if (d.isAfter(now)) {
-          return color[4];
+          return CustomTheme.currentTheme()[4];
         } else if (value == 0) {
-          return color[3];
+          return CustomTheme.currentTheme()[3];
         }
-        return value > avg ? color[1] : color[2];
+        return value > avg
+            ? CustomTheme.currentTheme()[1]
+            : CustomTheme.currentTheme()[2];
       }
 
       for (var i = 1; i <= lastDate.day; i++) {
@@ -249,7 +258,7 @@ class CustomCharts {
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: color[0]),
+                      color: CustomTheme.currentTheme()[0]),
                 ),
                 const Gap(14),
                 IconButton(

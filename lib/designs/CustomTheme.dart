@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomTheme {
-  static List<Color> currentTheme = ColorTheme.origin;
+  static int themeIndex = 0;
+  static List<Color> currentTheme() {
+    return CustomTheme.themeList[CustomTheme.themeIndex];
+  }
+
   static List<List<Color>> themeList = [
     ColorTheme.origin,
     ColorTheme.greens,

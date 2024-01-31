@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math' show max;
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/designs/CustomCharts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,12 +23,11 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final ClockTimer _timer = ClockTimer(0);
-  final customWidget = CustomWidget(ColorTheme.origin);
-  final customCharts = CustomCharts(ColorTheme.origin);
+  final customWidget = CustomWidget();
+  final customCharts = CustomCharts();
   final dataController = UserDataController();
 
   late Size size;
-  var color = CustomTheme.currentTheme;
 
   Future<void> timerHandler(int it) async => setState(() {
         if (it > 0) {
@@ -60,17 +58,7 @@ class _MainPageState extends State<MainPage> {
       return;
     }
 
-    setState(() {
-      dataController.isConnected = true;
-      dataController.init(json.decode(res.body.toString()));
-      themeUpdate();
-    });
-  }
-
-  void themeUpdate() {
-    color = CustomTheme.themeList[dataController.userData.settings.themeIndex];
-    customCharts.color = color;
-    customWidget.color = color;
+    login(res.body.toString());
   }
 
   Widget getFragment(var index) {
@@ -93,7 +81,7 @@ class _MainPageState extends State<MainPage> {
                 child: Text(Utils.convertSecond2Text(_timer.progress),
                     style: TextStyle(
                         fontSize: 32,
-                        color: color[0],
+                        color: CustomTheme.currentTheme()[0],
                         fontWeight: FontWeight.bold)),
               ),
               const Gap(36),
@@ -109,7 +97,8 @@ class _MainPageState extends State<MainPage> {
                       width: 272,
                       height: 272,
                       decoration: BoxDecoration(
-                          color: color[4], shape: BoxShape.circle),
+                          color: CustomTheme.currentTheme()[4],
+                          shape: BoxShape.circle),
                     ),
 
                     /** Circular Progress **/
@@ -117,7 +106,8 @@ class _MainPageState extends State<MainPage> {
                       width: 238,
                       height: 238,
                       child: CustomPaint(
-                        painter: BackgroundPainter(color, _timer.progress),
+                        painter: BackgroundPainter(
+                            CustomTheme.currentTheme(), _timer.progress),
                       ),
                     ),
                   ],
@@ -138,7 +128,8 @@ class _MainPageState extends State<MainPage> {
                       width: 76,
                       height: 76,
                       decoration: BoxDecoration(
-                          color: color[1], shape: BoxShape.circle),
+                          color: CustomTheme.currentTheme()[1],
+                          shape: BoxShape.circle),
                       child: IconButton(
                         onPressed: start,
                         iconSize: 36,
@@ -146,7 +137,7 @@ class _MainPageState extends State<MainPage> {
                             _timer.state == ClockState.running
                                 ? Icons.pause
                                 : Icons.play_arrow,
-                            color: color[4]),
+                            color: CustomTheme.currentTheme()[4]),
                       ),
                     ),
                     const Gap(24),
@@ -156,11 +147,13 @@ class _MainPageState extends State<MainPage> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                          color: color[2], shape: BoxShape.circle),
+                          color: CustomTheme.currentTheme()[2],
+                          shape: BoxShape.circle),
                       child: IconButton(
                         onPressed: stop,
                         iconSize: 24,
-                        icon: Icon(Icons.stop, color: color[4]),
+                        icon: Icon(Icons.stop,
+                            color: CustomTheme.currentTheme()[4]),
                       ),
                     ),
                   ],
@@ -200,7 +193,8 @@ class _MainPageState extends State<MainPage> {
                     crossAxisCount: 2,
                     children: <Widget>[
                       customWidget.cardView(
-                          Icon(Icons.timelapse, color: color[0]),
+                          Icon(Icons.timelapse,
+                              color: CustomTheme.currentTheme()[0]),
                           (dataController.getTotalFocused() ~/ 60).toString(),
                           "hours focused"),
                       customWidget.cardView(
@@ -209,7 +203,8 @@ class _MainPageState extends State<MainPage> {
                           dataController.getStreakDays().toString(),
                           "days streak"),
                       customWidget.cardView(
-                          Icon(Icons.calendar_month, color: color[0]),
+                          Icon(Icons.calendar_month,
+                              color: CustomTheme.currentTheme()[0]),
                           dataController.getAccessDays().toString(),
                           "days accessed")
                     ],
@@ -234,7 +229,9 @@ class _MainPageState extends State<MainPage> {
                     height: 6,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: chartIndex == 0 ? color[0] : color[4]),
+                        color: chartIndex == 0
+                            ? CustomTheme.currentTheme()[0]
+                            : CustomTheme.currentTheme()[4]),
                   ),
                   const Gap(12),
                   Container(
@@ -242,7 +239,9 @@ class _MainPageState extends State<MainPage> {
                     height: 6,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: chartIndex == 1 ? color[0] : color[4]),
+                        color: chartIndex == 1
+                            ? CustomTheme.currentTheme()[0]
+                            : CustomTheme.currentTheme()[4]),
                   ),
                   const Gap(12),
                   Container(
@@ -250,7 +249,9 @@ class _MainPageState extends State<MainPage> {
                     height: 6,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: chartIndex == 2 ? color[0] : color[4]),
+                        color: chartIndex == 2
+                            ? CustomTheme.currentTheme()[0]
+                            : CustomTheme.currentTheme()[4]),
                   )
                 ],
               ),
@@ -271,7 +272,7 @@ class _MainPageState extends State<MainPage> {
             height: 72,
             child: Card(
                 elevation: 8,
-                color: color[4],
+                color: CustomTheme.currentTheme()[4],
                 child: Row(
                   // mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -280,11 +281,12 @@ class _MainPageState extends State<MainPage> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: color[4]),
-                        margin: EdgeInsets.all(12),
+                            shape: BoxShape.circle,
+                            color: CustomTheme.currentTheme()[4]),
+                        margin: const EdgeInsets.all(12),
                         child: const IconButton(
                             onPressed: null, icon: Icon(Icons.person))),
-                    Container(
+                    SizedBox(
                       width: 288 - 86,
                       height: 48,
                       child: Column(
@@ -296,14 +298,14 @@ class _MainPageState extends State<MainPage> {
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: color[1]),
+                                color: CustomTheme.currentTheme()[1]),
                           ),
                           Text(
                             'ID: ${dataController.userData.id ?? 'ID'}',
                             style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.normal,
-                                color: color[2]),
+                                color: CustomTheme.currentTheme()[2]),
                           ),
                         ],
                       ),
@@ -333,7 +335,7 @@ class _MainPageState extends State<MainPage> {
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -341,13 +343,16 @@ class _MainPageState extends State<MainPage> {
                           left: 16,
                           width: 24,
                           height: 24,
-                          child: Icon(Icons.person, color: color[0]),
+                          child: Icon(Icons.person,
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               "Log",
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                           right: 16,
@@ -356,8 +361,8 @@ class _MainPageState extends State<MainPage> {
                           child: Container(
                               decoration: BoxDecoration(
                                   color: dataController.isConnected
-                                      ? color[3]
-                                      : color[2],
+                                      ? CustomTheme.currentTheme()[3]
+                                      : CustomTheme.currentTheme()[2],
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(100))),
                               child: TextButton(
@@ -368,7 +373,7 @@ class _MainPageState extends State<MainPage> {
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: color[4]),
+                                      color: CustomTheme.currentTheme()[4]),
                                 ),
                               )),
                         )
@@ -385,7 +390,7 @@ class _MainPageState extends State<MainPage> {
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -393,20 +398,23 @@ class _MainPageState extends State<MainPage> {
                           left: 16,
                           width: 24,
                           height: 24,
-                          child: Icon(Icons.timelapse, color: color[0]),
+                          child: Icon(Icons.timelapse,
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               "Focus Time",
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                             right: 32,
                             width: 48,
                             height: 32,
                             child: TextField(
-                                cursorColor: color[0],
+                                cursorColor: CustomTheme.currentTheme()[0],
                                 cursorHeight: 24,
                                 controller: focusTimeController,
                                 textAlign: TextAlign.center,
@@ -415,7 +423,7 @@ class _MainPageState extends State<MainPage> {
                                   border: InputBorder.none,
                                 ),
                                 style: TextStyle(
-                                    color: color[0],
+                                    color: CustomTheme.currentTheme()[0],
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold))),
                         Positioned(
@@ -471,7 +479,7 @@ class _MainPageState extends State<MainPage> {
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -483,13 +491,15 @@ class _MainPageState extends State<MainPage> {
                               dataController.userData.settings.light
                                   ? Icons.lightbulb_sharp
                                   : Icons.lightbulb_sharp,
-                              color: color[0]),
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               "Light",
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                           right: 16,
@@ -498,8 +508,8 @@ class _MainPageState extends State<MainPage> {
                           child: Container(
                               decoration: BoxDecoration(
                                   color: dataController.userData.settings.light
-                                      ? color[3]
-                                      : color[2],
+                                      ? CustomTheme.currentTheme()[3]
+                                      : CustomTheme.currentTheme()[2],
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(100))),
                               child: TextButton(
@@ -515,7 +525,7 @@ class _MainPageState extends State<MainPage> {
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: color[4]),
+                                      color: CustomTheme.currentTheme()[4]),
                                 ),
                               )),
                         )
@@ -529,7 +539,7 @@ class _MainPageState extends State<MainPage> {
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -541,13 +551,15 @@ class _MainPageState extends State<MainPage> {
                               dataController.userData.settings.vibration
                                   ? Icons.vibration
                                   : Icons.vibration,
-                              color: color[0]),
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               "Vibration",
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                           right: 16,
@@ -557,8 +569,8 @@ class _MainPageState extends State<MainPage> {
                               decoration: BoxDecoration(
                                   color:
                                       dataController.userData.settings.vibration
-                                          ? color[3]
-                                          : color[2],
+                                          ? CustomTheme.currentTheme()[3]
+                                          : CustomTheme.currentTheme()[2],
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(100))),
                               child: TextButton(
@@ -575,7 +587,7 @@ class _MainPageState extends State<MainPage> {
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: color[4]),
+                                      color: CustomTheme.currentTheme()[4]),
                                 ),
                               )),
                         )
@@ -589,7 +601,7 @@ class _MainPageState extends State<MainPage> {
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -601,13 +613,15 @@ class _MainPageState extends State<MainPage> {
                               dataController.userData.settings.sound
                                   ? Icons.volume_up
                                   : Icons.volume_off,
-                              color: color[0]),
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               "Sound",
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                           right: 16,
@@ -616,8 +630,8 @@ class _MainPageState extends State<MainPage> {
                           child: Container(
                               decoration: BoxDecoration(
                                   color: dataController.userData.settings.sound
-                                      ? color[3]
-                                      : color[2],
+                                      ? CustomTheme.currentTheme()[3]
+                                      : CustomTheme.currentTheme()[2],
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(100))),
                               child: TextButton(
@@ -632,7 +646,7 @@ class _MainPageState extends State<MainPage> {
                                       : "OFF",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: color[4]),
+                                      color: CustomTheme.currentTheme()[4]),
                                 ),
                               )),
                         )
@@ -643,13 +657,13 @@ class _MainPageState extends State<MainPage> {
               customWidget.getTitle("Theme"),
               const Gap(8),
 
-              /** Sound **/
+              /** Theme Picker **/
               SizedBox(
                   width: 288,
                   height: 64,
                   child: Card(
                     elevation: 8,
-                    color: color[4],
+                    color: CustomTheme.currentTheme()[4],
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -657,14 +671,17 @@ class _MainPageState extends State<MainPage> {
                           left: 16,
                           width: 24,
                           height: 24,
-                          child: Icon(Icons.palette, color: color[0]),
+                          child: Icon(Icons.palette,
+                              color: CustomTheme.currentTheme()[0]),
                         ),
                         Positioned(
                             left: 56,
                             child: Text(
                               CustomTheme.themeName[
                                   dataController.userData.settings.themeIndex],
-                              style: TextStyle(fontSize: 18, color: color[0]),
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: CustomTheme.currentTheme()[0]),
                             )),
                         Positioned(
                           right: 16,
@@ -672,9 +689,7 @@ class _MainPageState extends State<MainPage> {
                           height: 32,
                           child: Container(
                               decoration: BoxDecoration(
-                                  color: dataController.userData.settings.sound
-                                      ? color[3]
-                                      : color[2],
+                                  color: CustomTheme.currentTheme()[2],
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(100))),
                               child: TextButton(
@@ -685,7 +700,7 @@ class _MainPageState extends State<MainPage> {
                                   'select',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: color[4]),
+                                      color: CustomTheme.currentTheme()[4]),
                                 ),
                               )),
                         )
@@ -730,7 +745,7 @@ class _MainPageState extends State<MainPage> {
           });
         }
         return Container(
-          color: color[0],
+          color: CustomTheme.currentTheme()[0],
         );
       },
       onIndexChanged: (index) => {chartIndex = index, setState(() => {})},
@@ -788,6 +803,19 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  void login(String jsonString) async {
+    var decode = json.decode(jsonString);
+    setState(() {
+      dataController.init(decode);
+      dataController.isConnected = true;
+      focusTimeController.text =
+          dataController.userData.settings.targetTime.toString();
+      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
+      print(CustomTheme.themeIndex);
+      popupSnackBar('Successfully Login!');
+    });
+  }
+
   void logout() async {
     final storage = await SharedPreferences.getInstance();
     storage.remove('auto_login');
@@ -799,7 +827,7 @@ class _MainPageState extends State<MainPage> {
       dataController.logout();
       focusTimeController.text =
           dataController.userData.settings.targetTime.toString();
-      themeUpdate();
+      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
     });
 
     popupSnackBar('Logout');
@@ -811,15 +839,7 @@ class _MainPageState extends State<MainPage> {
 
     var jsonString = result.toString();
     if (jsonString != 'null') {
-      Map<String, dynamic> decode = json.decode(jsonString);
-      setState(() {
-        dataController.init(decode);
-        dataController.isConnected = true;
-        focusTimeController.text =
-            dataController.userData.settings.targetTime.toString();
-        themeUpdate();
-      });
-      popupSnackBar('Successfully Login!');
+      login(jsonString);
     }
   }
 
@@ -848,12 +868,14 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     Color getIconColors(var index) {
-      return index == fragmentIndex ? color[0] : color[4];
+      return index == fragmentIndex
+          ? CustomTheme.currentTheme()[0]
+          : CustomTheme.currentTheme()[4];
     }
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: color[3],
+      backgroundColor: CustomTheme.currentTheme()[3],
       body: SizedBox(
           width: size.width,
           height: size.height,
