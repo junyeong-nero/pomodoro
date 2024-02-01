@@ -18,12 +18,12 @@ class CustomTheme {
 
 class ColorTheme {
   static const List<Color> origin = [
-    Color.fromARGB(255, 13, 27, 42), // 0
-    Color.fromARGB(255, 27, 38, 59), // 1
-    Color.fromARGB(255, 71, 89, 117), // 2
-    Color.fromARGB(255, 124, 140, 167), // 3
-    Color.fromARGB(255, 217, 217, 217), // 4
-    Color.fromARGB(255, 197, 98, 98), // 5
+    Color.fromARGB(255, 13, 27, 42),
+    Color.fromARGB(255, 27, 38, 59),
+    Color.fromARGB(255, 71, 89, 117),
+    Color.fromARGB(255, 124, 140, 167),
+    Color.fromARGB(255, 217, 217, 217),
+    Color.fromARGB(255, 197, 98, 98),
   ];
 
   static const List<Color> greens = [

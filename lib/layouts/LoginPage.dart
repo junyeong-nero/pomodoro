@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:pomodoro/controllers/UserDataController.dart';
@@ -39,17 +41,27 @@ class _LoginState extends State<LoginPage> {
   }
 
   void signUp() async {
-    Map userData = {'id': idController.text, 'password': pwController.text};
-    var response = await UserDataController.register(userData);
-    if (!mounted) return;
-    if (response.body.toString() == 'null') {
-      popupSnackBar('Register Failed');
-      return;
-    }
+    try {
+      // Map userData = {'id': idController.text, 'password': pwController.text};
+      var userData = await Navigator.pushNamed(context, '/login/register');
+      if (userData == null || userData.toString() == 'null') {
+        return;
+      }
 
-    idController.text = '';
-    pwController.text = '';
-    popupSnackBar('Register Success! retry login');
+      userData = userData as Map<dynamic, dynamic>;
+      var response =
+          await UserDataController.register(userData);
+      if (!mounted) return;
+      if (response.body.toString() == 'null') {
+        throw 'Register Failed with Connection Error';
+      }
+
+      idController.text = '';
+      pwController.text = '';
+      popupSnackBar('Register Success! retry login');
+    } catch (err) {
+      popupSnackBar(err.toString());
+    }
   }
 
   void popupSnackBar(String text) {
@@ -136,7 +148,6 @@ class _LoginState extends State<LoginPage> {
                           ],
                         ),
                       )),
-                  const Gap(0),
                   SizedBox(
                       width: 288,
                       height: 72,
@@ -223,7 +234,8 @@ class _LoginState extends State<LoginPage> {
                         child: Text(
                           "Login",
                           style:
-                              TextStyle(color: CustomTheme.currentTheme()[4]),
+                              TextStyle(color: CustomTheme.currentTheme()[4],
+                              fontWeight: FontWeight.bold),
                         ),
                       )),
                   const Gap(4),

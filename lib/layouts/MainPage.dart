@@ -27,6 +27,12 @@ class _MainPageState extends State<MainPage> {
   final customCharts = CustomCharts();
   final dataController = UserDataController();
 
+  var fragmentIndex = 0;
+  var focusTimeController = TextEditingController();
+
+  var chartIndex = 0;
+  var chartTitles = ["Today", "Weekly", "Monthly"];
+
   late Size size;
 
   Future<void> timerHandler(int it) async => setState(() {
@@ -38,9 +44,6 @@ class _MainPageState extends State<MainPage> {
           }
         }
       });
-
-  var fragmentIndex = 0;
-  var focusTimeController = TextEditingController();
 
   void checkAutoLogin() async {
     final storage = await SharedPreferences.getInstance();
@@ -61,6 +64,142 @@ class _MainPageState extends State<MainPage> {
     }
 
     login(res.body.toString());
+  }
+
+  Swiper getStatisticChart() {
+    return Swiper(
+      layout: SwiperLayout.CUSTOM,
+      customLayoutOption: CustomLayoutOption(startIndex: -1, stateCount: 3)
+        // ..addRotate([-45.0 / 180, 0.0, 45.0 / 180])
+        ..addTranslate([
+          const Offset(-370.0, -40.0),
+          const Offset(0.0, 0.0),
+          const Offset(370.0, -40.0)
+        ]),
+      index: chartIndex,
+      itemWidth: 272,
+      itemHeight: 320,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return customCharts.getTodayChart(dataController);
+        }
+        if (index == 1) {
+          return customCharts.getWeeklyChart(dataController);
+        }
+        if (index == 2) {
+          return customCharts.getMonthlyChart(dataController, () {
+            setState(() {});
+          });
+        }
+        return Container(
+          color: CustomTheme.currentTheme()[0],
+        );
+      },
+      onIndexChanged: (index) => {chartIndex = index, setState(() => {})},
+      itemCount: 3,
+    );
+  }
+
+  /// Events
+  void start() {
+    if (_timer.state == ClockState.running) {
+      _timer.state = ClockState.pause;
+    } else if (_timer.state == ClockState.pause) {
+      _timer.state = ClockState.running;
+    } else if (_timer.state == ClockState.stop) {
+      _timer.progress = dataController.userData.settings.targetTime * 60;
+      _timer.state = ClockState.running;
+    }
+    setState(() {});
+  }
+
+  void stop() {
+    _timer.progress = 0;
+    _timer.state = ClockState.stop;
+    dataController.updateUserData();
+  }
+
+  bool fragmentButtonClick(var index) {
+    if (!dataController.isConnected) {
+      popupSnackBar('If you do not log in, your data will not be saved.');
+    }
+    dataController.updateUserData();
+    setState(() {
+      fragmentIndex = index;
+      if (index == 2) {
+        focusTimeController.text =
+            dataController.userData.settings.targetTime.toString();
+        focusTimeController.addListener(() {
+          if (focusTimeController.text.isNotEmpty) {
+            dataController
+                .updateTargetTime(int.parse(focusTimeController.text));
+          }
+        });
+      }
+    });
+    return false;
+  }
+
+  void logButtonClick() {
+    setState(() {
+      if (!dataController.isConnected) {
+        _navigateLogin(context);
+      } else {
+        stop();
+        logout();
+      }
+    });
+  }
+
+  Future<void> _navigateLogin(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, "/login");
+    if (!mounted) return;
+    var jsonString = result.toString();
+    if (jsonString != 'null') {
+      login(jsonString);
+    }
+  }
+
+  Future<void> _navigateThemePicker(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, "/theme_picker");
+    if (!mounted) return;
+    print(result);
+  }
+
+  void login(String jsonString) async {
+    var decode = json.decode(jsonString);
+    setState(() {
+      dataController.init(decode);
+      dataController.isConnected = true;
+      focusTimeController.text =
+          dataController.userData.settings.targetTime.toString();
+      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
+      popupSnackBar('Successfully Login!');
+    });
+  }
+
+  void logout() async {
+    final storage = await SharedPreferences.getInstance();
+    storage.remove('auto_login');
+    storage.remove('id');
+    storage.remove('password');
+
+    setState(() {
+      dataController.isConnected = false;
+      dataController.logout();
+      focusTimeController.text =
+          dataController.userData.settings.targetTime.toString();
+      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
+    });
+
+    popupSnackBar('Logout');
+  }
+
+  void popupSnackBar(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   Widget getFragment(var index) {
@@ -718,158 +857,18 @@ class _MainPageState extends State<MainPage> {
     return const Text("error");
   }
 
-  var chartIndex = 0;
-  var chartTitles = ["Today", "Weekly", "Monthly"];
-
-  Swiper getStatisticChart() {
-    return Swiper(
-      layout: SwiperLayout.CUSTOM,
-      customLayoutOption: CustomLayoutOption(startIndex: -1, stateCount: 3)
-        // ..addRotate([-45.0 / 180, 0.0, 45.0 / 180])
-        ..addTranslate([
-          const Offset(-370.0, -40.0),
-          const Offset(0.0, 0.0),
-          const Offset(370.0, -40.0)
-        ]),
-      index: chartIndex,
-      itemWidth: 272,
-      itemHeight: 320,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return customCharts.getTodayChart(dataController);
-        }
-        if (index == 1) {
-          return customCharts.getWeeklyChart(dataController);
-        }
-        if (index == 2) {
-          return customCharts.getMonthlyChart(dataController, () {
-            setState(() {});
-          });
-        }
-        return Container(
-          color: CustomTheme.currentTheme()[0],
-        );
-      },
-      onIndexChanged: (index) => {chartIndex = index, setState(() => {})},
-      itemCount: 3,
-    );
-  }
-
-  /// Events
-  void start() {
-    if (_timer.state == ClockState.running) {
-      _timer.state = ClockState.pause;
-    } else if (_timer.state == ClockState.pause) {
-      _timer.state = ClockState.running;
-    } else if (_timer.state == ClockState.stop) {
-      _timer.progress = dataController.userData.settings.targetTime * 60;
-      _timer.state = ClockState.running;
-    }
-    setState(() {});
-  }
-
-  void stop() {
-    _timer.progress = 0;
-    _timer.state = ClockState.stop;
-    dataController.updateUserData();
-  }
-
-  bool fragmentButtonClick(var index) {
-    if (!dataController.isConnected) {
-      popupSnackBar('If you do not log in, your data will not be saved.');
-    }
-    dataController.updateUserData();
-    setState(() {
-      fragmentIndex = index;
-      if (index == 2) {
-        focusTimeController.text =
-            dataController.userData.settings.targetTime.toString();
-        focusTimeController.addListener(() {
-          if (focusTimeController.text.isNotEmpty) {
-            dataController
-                .updateTargetTime(int.parse(focusTimeController.text));
-          }
-        });
-      }
-    });
-    return false;
-  }
-
-  void logButtonClick() {
-    setState(() {
-      if (!dataController.isConnected) {
-        _navigateLogin(context);
-      } else {
-        logout();
-      }
-    });
-  }
-
-  void login(String jsonString) async {
-    var decode = json.decode(jsonString);
-    setState(() {
-      dataController.init(decode);
-      dataController.isConnected = true;
-      focusTimeController.text =
-          dataController.userData.settings.targetTime.toString();
-      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
-      popupSnackBar('Successfully Login!');
-    });
-  }
-
-  void logout() async {
-    final storage = await SharedPreferences.getInstance();
-    storage.remove('auto_login');
-    storage.remove('id');
-    storage.remove('password');
-
-    setState(() {
-      dataController.isConnected = false;
-      dataController.logout();
-      focusTimeController.text =
-          dataController.userData.settings.targetTime.toString();
-      CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
-    });
-
-    popupSnackBar('Logout');
-  }
-
-  Future<void> _navigateLogin(BuildContext context) async {
-    final result = await Navigator.pushNamed(context, "/login");
-    if (!mounted) return;
-
-    var jsonString = result.toString();
-    if (jsonString != 'null') {
-      login(jsonString);
-    }
-  }
-
-  Future<void> _navigateThemePicker(BuildContext context) async {
-    final result = await Navigator.pushNamed(context, "/theme_picker");
-    if (!mounted) return;
-    print(result);
-  }
-
-  void popupSnackBar(String text) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
-  }
-
   @override
   void initState() {
-    super.initState();
-
     _timer.handler = timerHandler;
     checkAutoLogin();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     Color getIconColors(var index) {
-      return index == fragmentIndex
+      return fragmentIndex == index
           ? CustomTheme.currentTheme()[0]
           : CustomTheme.currentTheme()[4];
     }

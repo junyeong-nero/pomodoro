@@ -73,6 +73,21 @@ class UserDataController {
     return response;
   }
 
+  /// update registered userData
+  ///
+  /// @param(userData) must contain field 'id' and 'password'
+  static Future<http.Response> exist(String ID) async {
+    var url = Uri.http(serverURL, 'userRouter/api/exist');
+    var response = await http.post(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'id': ID
+        }));
+    return response;
+  }
+
   /// update registered userData which is connected to UserDataController
   /// it works equally to UserDataController.update(userDataController.userData);
   Future<bool> updateUserData() async {
