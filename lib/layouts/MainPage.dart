@@ -33,7 +33,9 @@ class _MainPageState extends State<MainPage> {
         if (it > 0) {
           dataController.addTodayFocusTime(1);
         } else if (it <= 0) {
-          stop();
+          if (_timer.state != ClockState.stop) {
+            stop();
+          }
         }
       });
 
@@ -198,8 +200,8 @@ class _MainPageState extends State<MainPage> {
                           (dataController.getTotalFocused() ~/ 60).toString(),
                           "hours focused"),
                       customWidget.cardView(
-                          const Icon(Icons.local_fire_department_rounded,
-                              color: Colors.deepOrange),
+                          Icon(Icons.local_fire_department_rounded,
+                              color: CustomTheme.currentTheme()[5]),
                           dataController.getStreakDays().toString(),
                           "days streak"),
                       customWidget.cardView(
@@ -811,7 +813,6 @@ class _MainPageState extends State<MainPage> {
       focusTimeController.text =
           dataController.userData.settings.targetTime.toString();
       CustomTheme.themeIndex = dataController.userData.settings.themeIndex;
-      print(CustomTheme.themeIndex);
       popupSnackBar('Successfully Login!');
     });
   }

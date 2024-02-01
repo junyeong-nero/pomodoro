@@ -23,7 +23,7 @@ class ColorTheme {
     Color.fromARGB(255, 71, 89, 117), // 2
     Color.fromARGB(255, 124, 140, 167), // 3
     Color.fromARGB(255, 217, 217, 217), // 4
-    Color.fromARGB(255, 244, 172, 183), // 5
+    Color.fromARGB(255, 197, 98, 98), // 5
   ];
 
   static const List<Color> greens = [
@@ -32,6 +32,6 @@ class ColorTheme {
     Color.fromARGB(255, 67, 104, 80),
     Color.fromARGB(255, 173, 188, 159),
     Color.fromARGB(255, 251, 250, 218),
-    Color.fromARGB(255, 244, 172, 183),
+    Color.fromARGB(255, 224, 176, 41),
   ];
 }

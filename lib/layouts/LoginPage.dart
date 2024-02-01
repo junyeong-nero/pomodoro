@@ -27,13 +27,13 @@ class _LoginState extends State<LoginPage> {
       popupSnackBar('Login Failed');
     } else {
       Navigator.pop(context, response.body);
-      final storage = await SharedPreferences.getInstance();
+      final pref = await SharedPreferences.getInstance();
       if (autoLogin) {
-        await storage.setString('id', userData['id']);
-        await storage.setString('password', userData['password']);
-        await storage.setBool('auto_login', true);
+        await pref.setString('id', userData['id']);
+        await pref.setString('password', userData['password']);
+        await pref.setBool('auto_login', true);
       } else {
-        await storage.remove('auto_login');
+        await pref.remove('auto_login');
       }
     }
   }
@@ -50,7 +50,6 @@ class _LoginState extends State<LoginPage> {
     idController.text = '';
     pwController.text = '';
     popupSnackBar('Register Success! retry login');
-
   }
 
   void popupSnackBar(String text) {
@@ -58,6 +57,13 @@ class _LoginState extends State<LoginPage> {
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  var hidePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -95,46 +101,98 @@ class _LoginState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 216,
-                    height: 56,
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        color: CustomTheme.currentTheme()[2],
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8))),
-                    child: TextField(
-                      controller: idController,
-                      cursorColor: CustomTheme.currentTheme()[4],
-                      style: TextStyle(color: CustomTheme.currentTheme()[4]),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "ID",
-                          hintStyle: TextStyle(color: CustomTheme.currentTheme()[3])),
-                    ),
-                  ),
-                  const Gap(8),
-                  Container(
-                    width: 216,
-                    height: 56,
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                        color: CustomTheme.currentTheme()[2],
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8))),
-                    child: TextField(
-                      controller: pwController,
-                      cursorColor: CustomTheme.currentTheme()[4],
-                      style: TextStyle(color: CustomTheme.currentTheme()[4]),
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Password",
-                          hintStyle: TextStyle(color: CustomTheme.currentTheme()[3])),
-                    ),
-                  ),
-                  const Gap(8),
                   SizedBox(
-                    width: 216,
+                      width: 288,
+                      height: 72,
+                      child: Card(
+                        elevation: 8,
+                        color: CustomTheme.currentTheme()[4],
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              margin: EdgeInsets.all(8),
+                              child: Icon(Icons.person,
+                                  color: CustomTheme.currentTheme()[1]),
+                            ),
+                            Container(
+                              width: 288 - 80,
+                              margin: EdgeInsets.fromLTRB(0, 8, 8, 8),
+                              child: TextField(
+                                controller: idController,
+                                cursorColor: CustomTheme.currentTheme()[4],
+                                style: TextStyle(
+                                    color: CustomTheme.currentTheme()[1]),
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "ID",
+                                    hintStyle: TextStyle(
+                                        color: CustomTheme.currentTheme()[3])),
+                              ),
+                            )
+                          ],
+                        ),
+                      )),
+                  const Gap(0),
+                  SizedBox(
+                      width: 288,
+                      height: 72,
+                      child: Card(
+                        elevation: 8,
+                        color: CustomTheme.currentTheme()[4],
+                        child: Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              margin: EdgeInsets.all(8),
+                              child: Icon(Icons.password,
+                                  color: CustomTheme.currentTheme()[1]),
+                            ),
+                            Container(
+                              width: 288 - 80 - 44,
+                              margin: EdgeInsets.fromLTRB(0, 8, 8, 8),
+                              child: TextField(
+                                obscureText: hidePassword,
+                                controller: pwController,
+                                cursorColor: CustomTheme.currentTheme()[4],
+                                style: TextStyle(
+                                    color: CustomTheme.currentTheme()[1]),
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Password",
+                                    hintStyle: TextStyle(
+                                        color: CustomTheme.currentTheme()[3])),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 36,
+                              height: 36,
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      hidePassword = !hidePassword;
+                                    });
+                                  },
+                                  icon: Icon(
+                                      hidePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      size: 18,
+                                      color: CustomTheme.currentTheme()[1])),
+                            ),
+                          ],
+                        ),
+                      )),
+                  const Gap(8),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(8, 2, 8, 2),
+                    width: 288,
                     child: Row(
                       children: [
                         Checkbox(
@@ -163,14 +221,15 @@ class _LoginState extends State<LoginPage> {
                       child: TextButton(
                         onPressed: signIn,
                         child: Text(
-                          "sign in",
-                          style: TextStyle(color: CustomTheme.currentTheme()[4]),
+                          "Login",
+                          style:
+                              TextStyle(color: CustomTheme.currentTheme()[4]),
                         ),
                       )),
                   const Gap(4),
                   TextButton(
                     child: Text(
-                      "sign up",
+                      "Create Account",
                       style: TextStyle(color: CustomTheme.currentTheme()[1]),
                     ),
                     onPressed: () {

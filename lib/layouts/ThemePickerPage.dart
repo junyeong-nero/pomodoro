@@ -22,7 +22,7 @@ class _ThemePickerState extends State<ThemePickerPage> {
     for (var i = 0; i < CustomTheme.themeList.length; i++) {
       var currentColor = CustomTheme.themeList[i];
       var widget = SizedBox(
-          width: 288,
+          width: 320,
           height: 64,
           child: Card(
             elevation: 8,
@@ -79,6 +79,18 @@ class _ThemePickerState extends State<ThemePickerPage> {
                   child: Container(
                     decoration: BoxDecoration(
                         color: currentColor[3],
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(100))),
+                  ),
+                ),
+
+                Positioned(
+                  right: 168,
+                  width: 32,
+                  height: 32,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: currentColor[5],
                         borderRadius:
                         const BorderRadius.all(Radius.circular(100))),
                   ),

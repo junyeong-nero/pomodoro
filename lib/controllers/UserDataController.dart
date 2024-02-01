@@ -28,13 +28,17 @@ class UserDataController {
   /// login with userData
   /// @param(userData) must contain field 'id' and 'password'
   static Future<http.Response> login(Map userData) async {
-    var url = Uri.http('localhost:3000', 'userRouter/api/login');
-    var response = await http.post(url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(userData));
-    return response;
+    try {
+      var url = Uri.http('localhost:3000', 'userRouter/api/login');
+      var response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(userData));
+      return response;
+    } catch(err) {
+      return http.Response('null', 500);
+    }
   }
 
   /// register with userData
@@ -42,14 +46,18 @@ class UserDataController {
   /// registered data initialized by UserData.init();
   /// @param(userData) must contain field 'id' and 'password'
   static Future<http.Response> register(Map userData) async {
-    var url = Uri.http('localhost:3000', 'userRouter/api/register');
-    var response = await http.post(url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(userData));
+    try {
+      var url = Uri.http('localhost:3000', 'userRouter/api/register');
+      var response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: json.encode(userData));
 
-    return response;
+      return response;
+    } catch(err) {
+      return http.Response('null', 500);
+    }
   }
 
   /// update registered userData
@@ -62,7 +70,6 @@ class UserDataController {
           'Content-Type': 'application/json',
         },
         body: json.encode(userData.toJson()));
-
     return response;
   }
 
