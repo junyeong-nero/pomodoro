@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:math' show max;
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:gap/gap.dart';
+import 'package:pomodoro/controllers/VibrateController.dart';
 import 'package:pomodoro/designs/CustomCharts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../ClockTimer.dart';
@@ -116,7 +118,25 @@ class _MainPageState extends State<MainPage> {
   void stop() {
     _timer.progress = 0;
     _timer.state = ClockState.stop;
+    if (dataController.userData.settings.vibration) {
+      VibrateController.vibrate(3);
+    }
+    if (dataController.userData.settings.light) {
+      blink(6);
+    }
+    if (dataController.userData.settings.sound) {
+      FlutterRingtonePlayer().playNotification();
+    }
     dataController.updateUserData();
+  }
+
+  void blink(int times) async {
+    for (var i = 0; i < times * 2; i++) {
+      setState(() {
+        blinkState = !blinkState;
+      });
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
   }
 
   bool fragmentButtonClick(var index) {
@@ -163,7 +183,7 @@ class _MainPageState extends State<MainPage> {
   Future<void> _navigateThemePicker(BuildContext context) async {
     final result = await Navigator.pushNamed(context, "/theme_picker");
     if (!mounted) return;
-    print(result);
+    dataController.userData.settings.themeIndex = CustomTheme.themeIndex;
   }
 
   void login(String jsonString) async {
@@ -202,7 +222,11 @@ class _MainPageState extends State<MainPage> {
       ..showSnackBar(SnackBar(content: Text(text)));
   }
 
+  var blinkState = true;
+
   Widget getFragment(var index) {
+
+    var color = CustomTheme.currentTheme();
     /** Clock Fragment **/
     if (index == 0) {
       return SizedBox(
@@ -232,6 +256,18 @@ class _MainPageState extends State<MainPage> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: blinkState ? color[5] : color[4],
+                        ),
+                      ),
+                    ),
+
                     /** Clock Background **/
                     Container(
                       alignment: Alignment.center,
@@ -336,7 +372,7 @@ class _MainPageState extends State<MainPage> {
                       customWidget.cardView(
                           Icon(Icons.timelapse,
                               color: CustomTheme.currentTheme()[0]),
-                          (dataController.getTotalFocused() ~/ 60).toString(),
+                          (dataController.getTotalFocused() / 3600).toStringAsFixed(2),
                           "hours focused"),
                       customWidget.cardView(
                           Icon(Icons.local_fire_department_rounded,

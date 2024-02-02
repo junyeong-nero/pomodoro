@@ -44,7 +44,7 @@ class CustomCharts {
               margin: const EdgeInsets.all(4),
               child: Column(
                 children: [
-                  Text(Utils.convertSecond2Hour(values[0].floor())),
+                  Text(Utils.convertSecond2display(values[0].floor())),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -69,7 +69,7 @@ class CustomCharts {
               margin: const EdgeInsets.all(4),
               child: Column(
                 children: [
-                  Text(Utils.convertSecond2Hour(values[1].floor())),
+                  Text(Utils.convertSecond2display(values[1].floor())),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -95,7 +95,7 @@ class CustomCharts {
               margin: const EdgeInsets.all(4),
               child: Column(
                 children: [
-                  Text(Utils.convertSecond2Hour(values[2].floor())),
+                  Text(Utils.convertSecond2display(values[2].floor())),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -154,7 +154,7 @@ class CustomCharts {
                   width: 24,
                   alignment: Alignment.center,
                   child: Text(
-                    Utils.convertSecond2Hour(values[i].floor()),
+                    Utils.convertSecond2display(values[i].floor()),
                     style: const TextStyle(fontSize: 9),
                   ),
                 ),
